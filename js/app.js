@@ -7,8 +7,8 @@ var Enemy = function(row, speed) {
     // a helper we've provided to easily load images
 
     this.sprite = 'images/enemy-bug.png';
-    this.row; // [1, 2, 3] bottom to top
-    this.speed; // [1 - 4] 1 - slow, 4 - fast
+    this.row = 1; // [1, 2, 3] bottom to top
+    this.speed = 1; // [1 - 4] 1 - slow, 4 - fast
     this.x = -100;
     this.setY = function () {
         this.y = 83 * (4 - this.row) - 20;
@@ -40,6 +40,7 @@ Enemy.prototype.update = function(dt) {
         this.speed = getRandomInt(1, 4);
         this.setY();
     }
+    if (collision(this)) player.death()
 };
 
 // Draw the enemy on the screen, required method for game
@@ -64,6 +65,10 @@ var Player = function(sprite) {
 };
 
 Player.prototype.update = function(dt) {
+    if (this.cellY == 5) {
+        state.score += 50;
+        this.setStartPosition();
+    }
 
 };
 
@@ -97,6 +102,29 @@ Player.prototype.handleInput =  function(key) {
             break;
     }
 };
+Player.prototype.setStartPosition = function() {
+    this.cellX = 2;
+    this.cellY = 0;
+};
+Player.prototype.death = function() {
+    state.lives--;
+    this.setStartPosition();
+};
+
+var state = {
+    score: 0,
+    lives: 3,
+    phase: 'init',
+    roundTime: 0,
+    scoreRender : function() {
+        ctx.strokeStyle = "#F00";
+        ctx.font = 'bold 30px sans-serif';
+        ctx.clearRect(0, 607, 505, 646);
+        ctx.strokeText("Score: " + this.score, 10, 640);
+        ctx.strokeText("Time: " + this.roundTime, 210, 640);
+        ctx.strokeText("Lives: " + this.lives, 380, 640);
+    }
+};
 
 
 // Now instantiate your objects.
@@ -121,6 +149,17 @@ function addEnemy(enemy) {
 // Using Math.round() will give you a non-uniform distribution!
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function collision(enemy) {
+    if (enemy.row != player.cellY-1) return false; // is not same row
+    var playerLeftBorder = 101 * player.cellX + 16, // 16 - player sprite paddings
+        playerRightBorder = playerLeftBorder + 70,  // 70 - player sprite width
+        enemyLeftBorder = enemy.x + 2,
+        enemyRightBorder = enemyLeftBorder + 98;
+
+    return ( (playerLeftBorder > enemyLeftBorder && playerLeftBorder < enemyRightBorder ) ||
+        (enemyLeftBorder > playerLeftBorder && enemyLeftBorder < playerRightBorder) )
 }
 
 addEnemy (new Enemy(1,1));
