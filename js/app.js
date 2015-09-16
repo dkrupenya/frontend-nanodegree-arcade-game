@@ -7,23 +7,13 @@ var Enemy = function(row, speed) {
     // a helper we've provided to easily load images
 
     this.sprite = 'images/enemy-bug.png';
-    this.row = 1; // [1, 2, 3] bottom to top
-    this.speed = 1; // [1 - 4] 1 - slow, 4 - fast
+    this.row = row || getRandomInt(1, 3); // [1, 2, 3] bottom to top
+    this.speed = speed || getRandomInt(1, 4); // [1 - 4] 1 - slow, 4 - fast
     this.x = -100;
     this.setY = function () {
         this.y = 83 * (4 - this.row) - 20;
     };
 
-    if (row === undefined) {
-        this.row = getRandomInt(1, 3);
-    } else {
-        this.row = row;
-    }
-    if (speed === undefined) {
-        this.speed = getRandomInt(1, 4);
-    } else {
-        this.speed = speed;
-    }
     this.setY();
 };
 
