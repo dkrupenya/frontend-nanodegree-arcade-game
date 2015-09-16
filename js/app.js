@@ -128,14 +128,16 @@ var state = {
             case 'init':
                 this.score = 0;
                 this.lives = 3;
+                player.setStartPosition();
                 this.initScreenRender();
                 break;
             case 'game':
+                player.sprite = this.characters[this.selectedCharacter];
+                initEnemies();
                 this.mainCallback();
                 break;
             case 'gameOver' :
                 this.gameOverRender();
-                console.log('gameOver');
                 break;
         }
     },
@@ -173,7 +175,6 @@ var state = {
         ctx.lineWidth="2";
         ctx.strokeStyle="red";
         ctx.rect(this.selectedCharacter*101, 60, 101 , 120);
-        console.log((this.selectedCharacter*101) + 101);
         ctx.stroke();
         // difficulties
         ctx.textAlign = "center";
@@ -197,9 +198,9 @@ var state = {
         ctx.textAlign = "center";
         ctx.strokeStyle = "#F00";
         ctx.font = 'bold 60px sans-serif';
-        ctx.strokeText("GAME OVER", 250, 200);
+        ctx.strokeText("GAME OVER", 250, 450);
         ctx.font = 'bold 30px sans-serif';
-        ctx.strokeText("press space to play again", 250, 280);
+        ctx.strokeText("press space to play again", 250, 530);
     },
     initHandleInput : function(key) {
         switch (key) {
@@ -245,9 +246,14 @@ var player = new Player();
 
 var allEnemies = [];
 
-function addEnemy(enemy) {
-    allEnemies.push(enemy);
+function initEnemies() {
+    allEnemies = [];
+    // easy - 2 bugs, normal - 3 bugs, hard - 4 bugs
+    for (var i = 0; i < state.difficulty + 2; i++) {
+        allEnemies.push(new Enemy());
+    }
 }
+
 
 /* not in use now */
 //function deleteEnemy(enemy){
@@ -272,11 +278,6 @@ function collision(enemy) {
     return ( (playerLeftBorder > enemyLeftBorder && playerLeftBorder < enemyRightBorder ) ||
         (enemyLeftBorder > playerLeftBorder && enemyLeftBorder < playerRightBorder) )
 }
-
-addEnemy (new Enemy(1,1));
-addEnemy (new Enemy(2,2));
-addEnemy (new Enemy(3,4));
-
 
 
 // This listens for key presses and sends the keys to your
