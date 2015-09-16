@@ -63,6 +63,9 @@ var Engine = (function(global) {
         }
     }
 
+    /**
+     * run 'main' loop for a first time
+     */
     function initMain() {
         lastTime = Date.now();
         main();
