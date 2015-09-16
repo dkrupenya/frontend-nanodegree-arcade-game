@@ -108,21 +108,132 @@ Player.prototype.setStartPosition = function() {
 };
 Player.prototype.death = function() {
     state.lives--;
-    this.setStartPosition();
+    if (state.lives > 0) {
+        this.setStartPosition();
+    } else {
+        state.phase = 'gameOver';
+    }
 };
 
 var state = {
     score: 0,
     lives: 3,
-    phase: 'init',
+    phase: 'init', // init | game | gameOver
+    difficulty: 1, // 0 -easy, 1 - normal, 2 - hard
     roundTime: 0,
+    mainCallback : {},
+    render : function(mainCallback){
+        if (mainCallback) this.mainCallback = mainCallback
+        switch (this.phase) {
+            case 'init':
+                this.score = 0;
+                this.lives = 3;
+                this.initScreenRender();
+                break;
+            case 'game':
+                this.mainCallback();
+                break;
+            case 'gameOver' :
+                this.gameOverRender();
+                console.log('gameOver');
+                break;
+        }
+    },
+    characters: [
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png'
+    ],
+    difficulties: [
+        'easy',
+        'normal',
+        'hard'
+    ],
+    selectedCharacter: 0,
     scoreRender : function() {
+        ctx.clearRect(0, 607, 505, 646);
+        ctx.textAlign = "left";
         ctx.strokeStyle = "#F00";
         ctx.font = 'bold 30px sans-serif';
-        ctx.clearRect(0, 607, 505, 646);
         ctx.strokeText("Score: " + this.score, 10, 640);
-        ctx.strokeText("Time: " + this.roundTime, 210, 640);
+        //ctx.strokeText("Time: " + this.roundTime, 210, 640);
         ctx.strokeText("Lives: " + this.lives, 380, 640);
+    },
+    initScreenRender: function() {
+        var i;
+        ctx.clearRect(0, 0, 505, 646);
+        // draw characters
+        for (i = 0; i < 5; i++) {
+            ctx.drawImage(Resources.get(this.characters[i]), i * 101, 20);
+        }
+        // border for selected character
+        ctx.beginPath();
+        ctx.lineWidth="2";
+        ctx.strokeStyle="red";
+        ctx.rect(this.selectedCharacter*101, 60, 101 , 120);
+        console.log((this.selectedCharacter*101) + 101);
+        ctx.stroke();
+        // difficulties
+        ctx.textAlign = "center";
+        for (i = 0; i < 3; i++) {
+            ctx.strokeStyle = "#666";
+            if (i == this.difficulty) ctx.strokeStyle = "#F00";
+            ctx.font = 'bold 40px sans-serif';
+            ctx.strokeText(this.difficulties[i], 252, 250 + i*50);
+        }
+
+        // help
+        ctx.textAlign = "left";
+        ctx.strokeStyle = "#666";
+        ctx.font = 'bold 30px sans-serif';
+        ctx.strokeText("left/right - select character", 0, 500);
+        ctx.strokeText("up/down - select difficulty", 0, 540);
+        ctx.strokeText("space - start", 0, 580);
+
+    },
+    gameOverRender : function() {
+        ctx.textAlign = "center";
+        ctx.strokeStyle = "#F00";
+        ctx.font = 'bold 60px sans-serif';
+        ctx.strokeText("GAME OVER", 250, 200);
+        ctx.font = 'bold 30px sans-serif';
+        ctx.strokeText("press space to play again", 250, 280);
+    },
+    initHandleInput : function(key) {
+        switch (key) {
+            case 'left':
+                if (this.selectedCharacter > 0) {
+                    this.selectedCharacter--;
+                }
+                break;
+            case 'right':
+                if (this.selectedCharacter < 4) {
+                    this.selectedCharacter++;
+                }
+                break;
+            case 'up':
+                if (this.difficulty > 0) {
+                    this.difficulty--;
+                }
+                break;
+            case 'down':
+                if (this.difficulty < 2) {
+                    this.difficulty++;
+                }
+                break;
+            case 'space' :
+                this.phase = 'game'
+
+        }
+        this.render();
+    },
+    gameOverHandleInput : function(key) {
+        if (key == 'space') {
+            this.phase = 'init';
+            this.render();
+        }
     }
 };
 
@@ -175,8 +286,18 @@ document.addEventListener('keyup', function(e) {
         37: 'left',
         38: 'up',
         39: 'right',
-        40: 'down'
+        40: 'down',
+        32: 'space'
     };
+    switch (state.phase) {
+        case 'game' :
+            player.handleInput(allowedKeys[e.keyCode]);
+            break;
+        case 'init' :
+            state.initHandleInput(allowedKeys[e.keyCode]);
+            break;
+        case 'gameOver' :
+            state.gameOverHandleInput(allowedKeys[e.keyCode]);
+    }
 
-    player.handleInput(allowedKeys[e.keyCode]);
 });

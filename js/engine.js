@@ -56,7 +56,16 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        win.requestAnimationFrame(main);
+        if (state.phase == 'game') {
+            win.requestAnimationFrame(main);
+        } else {
+            state.render();
+        }
+    }
+
+    function initMain() {
+        lastTime = Date.now();
+        main();
     }
 
     /* This function does some initial setup that should only occur once,
@@ -64,9 +73,10 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-        reset();
-        lastTime = Date.now();
-        main();
+        state.render(initMain);
+        //reset();
+        //lastTime = Date.now();
+        //main();
     }
 
     /* This function is called by main (our game loop) and itself calls all
