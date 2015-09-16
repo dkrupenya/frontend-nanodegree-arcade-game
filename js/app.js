@@ -5,11 +5,26 @@ var Enemy = function(row, speed) {
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
+
     this.sprite = 'images/enemy-bug.png';
-    this.row = row; // [1, 2, 3] bottom to top
-    this.speed = speed; // [1 - 3] 1 - slow, 3 - fast
+    this.row; // [1, 2, 3] bottom to top
+    this.speed; // [1 - 4] 1 - slow, 4 - fast
     this.x = -100;
-    this.y = 83 * (4 - this.row) - 20;
+    this.setY = function () {
+        this.y = 83 * (4 - this.row) - 20;
+    };
+
+    if (row === undefined) {
+        this.row = getRandomInt(1, 3);
+    } else {
+        this.row = row;
+    }
+    if (speed === undefined) {
+        this.speed = getRandomInt(1, 4);
+    } else {
+        this.speed = speed;
+    }
+    this.setY();
 };
 
 // Update the enemy's position, required method for game
@@ -18,9 +33,12 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
-    this.x = this.x + dt * this.speed*40;
+    this.x = this.x + dt * this.speed*80;
     if (this.x > 505) {
         this.x = -100;
+        this.row = getRandomInt(1, 3);
+        this.speed = getRandomInt(1, 4);
+        this.setY();
     }
 };
 
@@ -87,9 +105,28 @@ Player.prototype.handleInput =  function(key) {
 var player = new Player();
 
 var allEnemies = [];
-allEnemies.push (new Enemy(1,1));
-allEnemies.push (new Enemy(2,2));
-allEnemies.push (new Enemy(3,3));
+
+function addEnemy(enemy) {
+    allEnemies.push(enemy);
+}
+
+/* not in use now */
+//function deleteEnemy(enemy){
+//    var i = allEnemies.indexOf(enemy);
+//    if (i == -1) throw new Error("can't find enemy in allEnemies array");
+//    allEnemies.splice(i,1);
+//}
+
+// Returns a random integer between min (included) and max (included)
+// Using Math.round() will give you a non-uniform distribution!
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+addEnemy (new Enemy(1,1));
+addEnemy (new Enemy(2,2));
+addEnemy (new Enemy(3,4));
+
 
 
 // This listens for key presses and sends the keys to your
