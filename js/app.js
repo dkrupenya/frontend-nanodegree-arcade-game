@@ -45,7 +45,9 @@ Enemy.prototype.update = function(dt) {
         this.setY();
     }
     // check for collision with player
-    if (collision(this)) player.death()
+    if (collision(this)) {
+        player.death();
+    }
 };
 
 // Draw the enemy on the screen, required method for game
@@ -64,16 +66,15 @@ var Player = function(sprite) {
     if (sprite) {
         this.sprite = sprite;
     } else {
-        this.sprite = 'images/char-boy.png'
+        this.sprite = 'images/char-boy.png';
     }
 
 };
 /**
  * check player state
- * @param dt - not used
  */
-Player.prototype.update = function(dt) {
-    if (this.cellY == 5) {
+Player.prototype.update = function() {
+    if (this.cellY === 5) {
         state.score += 50;
         this.setStartPosition();
     }
@@ -129,7 +130,7 @@ Player.prototype.death = function() {
 };
 /**
  * object to hold game information
- * @type {{score: number, lives: number, phase: string, difficulty: number, roundTime: number, mainCallback: {}, render: Function, characters: string[], difficulties: string[], selectedCharacter: number, scoreRender: Function, initScreenRender: Function, gameOverRender: Function, initHandleInput: Function, gameOverHandleInput: Function}}
+ * @type {{score: number, lives: number, phase: String("init"), difficulty: number, roundTime: number, mainCallback: Function, render: Function, characters: string[], difficulties: string[], selectedCharacter: number, scoreRender: Function, initScreenRender: Function, gameOverRender: Function, initHandleInput: Function, gameOverHandleInput: Function}}
  */
 var state = {
     score: 0,
@@ -137,13 +138,15 @@ var state = {
     phase: 'init', // init | game | gameOver
     difficulty: 1, // 0 -easy, 1 - normal, 2 - hard
     roundTime: 0,
-    mainCallback : {},
+    mainCallback : undefined,
     /**
      * call different renderers depending on current game phase
      * @param mainCallback - need to call main function from engine.js
      */
     render : function(mainCallback){
-        if (mainCallback) this.mainCallback = mainCallback; // save callback when call renderer from engine.js
+        if (mainCallback) {
+            this.mainCallback = mainCallback; // save callback when call renderer from engine.js
+        }
         switch (this.phase) {
             case 'init':
                 // reset game state
@@ -205,7 +208,9 @@ var state = {
         ctx.textAlign = "center";
         for (i = 0; i < 3; i++) {
             ctx.strokeStyle = "#666";
-            if (i == this.difficulty) ctx.strokeStyle = "#F00";
+            if (i === this.difficulty) {
+                ctx.strokeStyle = "#F00";
+            }
             ctx.font = 'bold 40px sans-serif';
             ctx.strokeText(this.difficulties[i], 252, 250 + i*50);
         }
@@ -255,7 +260,7 @@ var state = {
                 }
                 break;
             case 'space' :
-                this.phase = 'game'
+                this.phase = 'game';
 
         }
         this.render();
@@ -265,7 +270,7 @@ var state = {
      * @param key
      */
     gameOverHandleInput : function(key) {
-        if (key == 'space') {
+        if (key === 'space') {
             this.phase = 'init';
             this.render();
         }
@@ -302,14 +307,16 @@ function getRandomInt(min, max) {
  * @returns {boolean}
  */
 function collision(enemy) {
-    if (enemy.row != player.cellY-1) return false; // is not same row
+    if (enemy.row !== player.cellY-1) {
+        return false; // is not same row
+    }
     var playerLeftBorder = TILE_WIDTH * player.cellX + 16, // 16 - player sprite paddings
         playerRightBorder = playerLeftBorder + 70,  // 70 - player sprite width
         enemyLeftBorder = enemy.x + 2,
         enemyRightBorder = enemyLeftBorder + 98;
 
     return ( (playerLeftBorder > enemyLeftBorder && playerLeftBorder < enemyRightBorder ) ||
-        (enemyLeftBorder > playerLeftBorder && enemyLeftBorder < playerRightBorder) )
+        (enemyLeftBorder > playerLeftBorder && enemyLeftBorder < playerRightBorder) );
 }
 
 

@@ -56,7 +56,7 @@ var Engine = (function(global) {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        if (state.phase == 'game') {
+        if (state.phase === 'game') {
             win.requestAnimationFrame(main);
         } else {
             state.render();
@@ -170,15 +170,7 @@ var Engine = (function(global) {
         state.scoreRender();
     }
 
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
-     */
-    function reset() {
-        // noop
-    }
-
-    /* Go ahead and load all of the images we know we're going to need to
+     /* Go ahead and load all of the images we know we're going to need to
      * draw our game level. Then set init as the callback method, so that when
      * all of these images are properly loaded our game will start.
      */
