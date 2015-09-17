@@ -1,3 +1,8 @@
+//constants
+var TILE_WIDTH = 101,
+    TILE_HEIGHT = 83;
+
+
 // Enemies our player must avoid
 /**
  *
@@ -19,7 +24,7 @@ var Enemy = function(row, speed) {
     // calculate y position based on row number
     // call this each time you change the row
     this.setY = function () {
-        this.y = 83 * (4 - this.row) - 20;
+        this.y = TILE_HEIGHT * (4 - this.row) - 20;
     };
 
     this.setY();
@@ -76,8 +81,8 @@ Player.prototype.update = function(dt) {
 };
 
 Player.prototype.render = function() {
-    var x = 101 * this.cellX,
-        y = 83  * (5-this.cellY) - 10;
+    var x = TILE_WIDTH * this.cellX,
+        y = TILE_HEIGHT  * (5-this.cellY) - 10;
     ctx.drawImage(Resources.get(this.sprite), x, y);
 };
 /**
@@ -188,13 +193,13 @@ var state = {
         ctx.clearRect(0, 0, 505, 646);
         // draw characters
         for (i = 0; i < 5; i++) {
-            ctx.drawImage(Resources.get(this.characters[i]), i * 101, 20);
+            ctx.drawImage(Resources.get(this.characters[i]), i * TILE_WIDTH, 20);
         }
         // border for selected character
         ctx.beginPath();
         ctx.lineWidth="2";
         ctx.strokeStyle="red";
-        ctx.rect(this.selectedCharacter*101, 60, 101 , 120);
+        ctx.rect(this.selectedCharacter*TILE_WIDTH, 60, TILE_WIDTH , 120);
         ctx.stroke();
         // difficulties
         ctx.textAlign = "center";
@@ -298,7 +303,7 @@ function getRandomInt(min, max) {
  */
 function collision(enemy) {
     if (enemy.row != player.cellY-1) return false; // is not same row
-    var playerLeftBorder = 101 * player.cellX + 16, // 16 - player sprite paddings
+    var playerLeftBorder = TILE_WIDTH * player.cellX + 16, // 16 - player sprite paddings
         playerRightBorder = playerLeftBorder + 70,  // 70 - player sprite width
         enemyLeftBorder = enemy.x + 2,
         enemyRightBorder = enemyLeftBorder + 98;
